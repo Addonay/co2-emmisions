@@ -25,45 +25,8 @@ services:
       retries: 5
       start_period: 30s
 
-  # pgAdmin for database management (optional)
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: co2_pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@co2pipeline.com
-      PGADMIN_DEFAULT_PASSWORD: adminpassword
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
-    ports:
-      - "8080:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - co2_network
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # Redis for caching (optional but recommended for production)
-  redis:
-    image: redis:latest
-    container_name: co2_redis_cache
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - co2_network
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-
 volumes:
   postgres_data:
-    driver: local
-  pgadmin_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:

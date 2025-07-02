@@ -10,10 +10,12 @@ import pandas as pd
 import plotly.express as px
 import polars as pl
 import streamlit as st
+from dotenv import load_dotenv
 from pydantic import BaseModel, field_validator
 from sqlmodel import Field, Session, SQLModel, and_, create_engine, select
 
 warnings.filterwarnings("ignore")
+load_dotenv()
 
 
 # =============================================================================
@@ -71,7 +73,7 @@ class CountryData(BaseModel):
 class Country(SQLModel, table=True):
     __name__ = "country"  # Singular table name
     __table_args__ = {"extend_existing": True}
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
     country: str = Field(index=True)
     sub_region: str
@@ -85,9 +87,11 @@ class Country(SQLModel, table=True):
 class EconomicData(SQLModel, table=True):
     __name__ = "economic_data"  # Singular table name
     __table_args__ = {"extend_existing": True}
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    country_id: int = Field(foreign_key="country.id", index=True)  # Foreign key relationship
+    country_id: int = Field(
+        foreign_key="country.id", index=True
+    )  # Foreign key relationship
     year: int = Field(index=True)
     population: int
     gdp_per_capita: float
@@ -100,9 +104,11 @@ class EconomicData(SQLModel, table=True):
 class EmissionData(SQLModel, table=True):
     __name__ = "emission_data"  # Singular table name
     __table_args__ = {"extend_existing": True}
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    country_id: int = Field(foreign_key="country.id", index=True)  # Foreign key relationship
+    country_id: int = Field(
+        foreign_key="country.id", index=True
+    )  # Foreign key relationship
     year: int = Field(index=True)
     transportation_mt: Optional[float] = 0.0
     total_co2_including_lucf: Optional[float] = None
@@ -124,10 +130,7 @@ class EmissionData(SQLModel, table=True):
 # DATABASE CONNECTION AND OPERATIONS
 # =============================================================================
 
-DATABASE_URL = (
-    "postgresql+psycopg://co2user:co2password@localhost:5432/co2_emissions"
-)
-
+DATABASE_URL = os.environ["DATABASE_URL"]
 # Global engine variable
 engine = None
 
@@ -152,6 +155,7 @@ def init_database():
         st.error(f"Failed to initialize database: {str(e)}")
         return False
 
+
 # =============================================================================
 # LOADING DATA FROM CSVs WITH PROPER RELATIONSHIPS AND ERROR HANDLING
 # =============================================================================
@@ -160,7 +164,9 @@ def init_database():
 def inspect_csv_columns(csv_path: str):
     """Inspect CSV columns for debugging"""
     try:
-        df = pd.read_csv(csv_path, nrows=1)  # Read only first row to check columns
+        df = pd.read_csv(
+            csv_path, nrows=1
+        )  # Read only first row to check columns
         print(f"Columns in {csv_path}: {list(df.columns)}")
         return list(df.columns)
     except Exception as e:
@@ -175,38 +181,42 @@ def load_countries(csv_path: str) -> dict[str, int]:
     if not columns:
         print(f"Could not read columns from {csv_path}")
         return {}
-    
+
     df = pd.read_csv(csv_path)
     country_map: dict[str, int] = {}
-    
+
     # Print first few rows for debugging
     print(f"First 3 rows of {csv_path}:")
     print(df.head(3))
-    
+
     # Try to identify the correct column names (case-insensitive)
     country_col = None
     sub_region_col = None
     code_col = None
     area_col = None
-    
+
     # Look for country column variations
     for col in df.columns:
         col_lower = col.lower().strip()
-        if 'country' in col_lower and not any(x in col_lower for x in ['code', 'id']):
+        if "country" in col_lower and not any(
+            x in col_lower for x in ["code", "id"]
+        ):
             country_col = col
-        elif 'sub' in col_lower and 'region' in col_lower:
+        elif "sub" in col_lower and "region" in col_lower:
             sub_region_col = col
-        elif 'code' in col_lower:
+        elif "code" in col_lower:
             code_col = col
-        elif 'area' in col_lower or 'km' in col_lower:
+        elif "area" in col_lower or "km" in col_lower:
             area_col = col
-    
-    print(f"Identified columns - Country: {country_col}, Sub-region: {sub_region_col}, Code: {code_col}, Area: {area_col}")
-    
+
+    print(
+        f"Identified columns - Country: {country_col}, Sub-region: {sub_region_col}, Code: {code_col}, Area: {area_col}"
+    )
+
     if not all([country_col, sub_region_col, code_col]):
         print("Error: Could not identify required columns in countries.csv")
         return {}
-    
+
     with Session(get_engine()) as session:
         for _, row in df.iterrows():
             try:
@@ -220,14 +230,14 @@ def load_countries(csv_path: str) -> dict[str, int]:
             except Exception as e:
                 print(f"Error processing country row: {e}")
                 continue
-                
+
         session.commit()
-        
+
         # Build map from country name to id
         stmt = select(Country)
         for c in session.exec(stmt):
             country_map[c.country] = c.id  # type: ignore
-    
+
     print(f"Loaded {len(country_map)} countries")
     return country_map
 
@@ -239,70 +249,79 @@ def load_economic_data(csv_path: str, country_map: dict[str, int]):
     if not columns:
         print(f"Could not read columns from {csv_path}")
         return
-    
+
     df = pd.read_csv(csv_path)
-    
+
     # Print first few rows for debugging
     print(f"First 3 rows of {csv_path}:")
     print(df.head(3))
-    
+
     # Try to identify the correct column names
     country_col = None
     year_col = None
     population_col = None
     gdp_col = None
     gdp_ppp_col = None
-    
+
     for col in df.columns:
         col_lower = col.lower().strip()
-        if 'country' in col_lower and not any(x in col_lower for x in ['code', 'id']):
+        if "country" in col_lower and not any(
+            x in col_lower for x in ["code", "id"]
+        ):
             country_col = col
-        elif 'year' in col_lower:
+        elif "year" in col_lower:
             year_col = col
-        elif 'population' in col_lower:
+        elif "population" in col_lower:
             population_col = col
-        elif 'gdp' in col_lower and 'ppp' not in col_lower:
+        elif "gdp" in col_lower and "ppp" not in col_lower:
             gdp_col = col
-        elif 'gdp' in col_lower and 'ppp' in col_lower:
+        elif "gdp" in col_lower and "ppp" in col_lower:
             gdp_ppp_col = col
-    
-    print(f"Identified columns - Country: {country_col}, Year: {year_col}, Population: {population_col}, GDP: {gdp_col}, GDP PPP: {gdp_ppp_col}")
-    
+
+    print(
+        f"Identified columns - Country: {country_col}, Year: {year_col}, Population: {population_col}, GDP: {gdp_col}, GDP PPP: {gdp_ppp_col}"
+    )
+
     if not all([country_col, year_col, population_col, gdp_col]):
         print("Error: Could not identify required columns in economic_data.csv")
         return
-    
+
     with Session(get_engine()) as session:
         success_count = 0
         error_count = 0
-        
+
         for _, row in df.iterrows():
             try:
                 country_name = str(row[country_col])
                 country_id = country_map.get(country_name)
-                
+
                 if country_id is None:
-                    print(f"Warning: Country '{country_name}' not found in country_map")
+                    print(
+                        f"Warning: Country '{country_name}' not found in country_map"
+                    )
                     error_count += 1
                     continue
-                    
+
                 econ = EconomicData(
                     country_id=country_id,
                     year=int(row[year_col]),
                     population=int(row[population_col]),
                     gdp_per_capita=float(row[gdp_col]),
-                    gdp_per_capita_ppp=row.get(gdp_ppp_col) if gdp_ppp_col else None,
+                    gdp_per_capita_ppp=row.get(gdp_ppp_col)
+                    if gdp_ppp_col
+                    else None,
                 )
                 session.add(econ)
                 success_count += 1
-                
+
             except Exception as e:
                 print(f"Error processing economic data row: {e}")
                 error_count += 1
                 continue
-                
+
         session.commit()
         print(f"Economic data: {success_count} success, {error_count} errors")
+
 
 def insert_country_data(data: CountryData):
     """Insert validated data into database tables using SQLModel with proper relationships"""
@@ -383,6 +402,7 @@ def insert_country_data(data: CountryData):
         st.error(f"Database error: {str(e)}")
         return False
 
+
 def load_emission_data(csv_path: str, country_map: dict[str, int]):
     """Load emission data with proper country_id relationships"""
     # First inspect the CSV structure
@@ -390,13 +410,13 @@ def load_emission_data(csv_path: str, country_map: dict[str, int]):
     if not columns:
         print(f"Could not read columns from {csv_path}")
         return
-    
+
     df = pd.read_csv(csv_path)
-    
+
     # Print first few rows for debugging
     print(f"First 3 rows of {csv_path}:")
     print(df.head(3))
-    
+
     # Try to identify the correct column names
     country_col = None
     year_col = None
@@ -405,52 +425,64 @@ def load_emission_data(csv_path: str, country_map: dict[str, int]):
     energy_col = None
     transport_col = None
     electricity_col = None
-    
+
     for col in df.columns:
         col_lower = col.lower().strip()
-        if 'country' in col_lower and not any(x in col_lower for x in ['code', 'id']):
+        if "country" in col_lower and not any(
+            x in col_lower for x in ["code", "id"]
+        ):
             country_col = col
-        elif 'year' in col_lower:
+        elif "year" in col_lower:
             year_col = col
-        elif 'co2' in col_lower and 'excluding' in col_lower:
+        elif "co2" in col_lower and "excluding" in col_lower:
             co2_excl_col = col
-        elif 'co2' in col_lower and 'including' in col_lower:
+        elif "co2" in col_lower and "including" in col_lower:
             co2_incl_col = col
-        elif 'energy' in col_lower and 'mt' in col_lower:
+        elif "energy" in col_lower and "mt" in col_lower:
             energy_col = col
-        elif 'transport' in col_lower:
+        elif "transport" in col_lower:
             transport_col = col
-        elif 'electricity' in col_lower or 'heat' in col_lower:
+        elif "electricity" in col_lower or "heat" in col_lower:
             electricity_col = col
-    
-    print(f"Identified columns - Country: {country_col}, Year: {year_col}, CO2 Excl: {co2_excl_col}")
-    
+
+    print(
+        f"Identified columns - Country: {country_col}, Year: {year_col}, CO2 Excl: {co2_excl_col}"
+    )
+
     if not all([country_col, year_col, co2_excl_col]):
         print("Error: Could not identify required columns in emissions.csv")
         return
-    
+
     with Session(get_engine()) as session:
         success_count = 0
         error_count = 0
-        
+
         for _, row in df.iterrows():
             try:
                 country_name = str(row[country_col])
                 country_id = country_map.get(country_name)
-                
+
                 if country_id is None:
-                    print(f"Warning: Country '{country_name}' not found in country_map")
+                    print(
+                        f"Warning: Country '{country_name}' not found in country_map"
+                    )
                     error_count += 1
                     continue
-                    
+
                 emis = EmissionData(
                     country_id=country_id,
                     year=int(row[year_col]),
                     total_co2_excluding_lucf=float(row[co2_excl_col]),
-                    total_co2_including_lucf=row.get(co2_incl_col) if co2_incl_col else None,
+                    total_co2_including_lucf=row.get(co2_incl_col)
+                    if co2_incl_col
+                    else None,
                     energy_mt=row.get(energy_col) if energy_col else None,
-                    transportation_mt=row.get(transport_col) if transport_col else None,
-                    electricity_heat=row.get(electricity_col) if electricity_col else None,
+                    transportation_mt=row.get(transport_col)
+                    if transport_col
+                    else None,
+                    electricity_heat=row.get(electricity_col)
+                    if electricity_col
+                    else None,
                     # Set other fields to default values for now
                     other_fuel_combustion=0.0,
                     manufacturing_construction=0.0,
@@ -461,15 +493,16 @@ def load_emission_data(csv_path: str, country_map: dict[str, int]):
                 )
                 session.add(emis)
                 success_count += 1
-                
+
             except Exception as e:
                 print(f"Error processing emission data row: {e}")
                 error_count += 1
                 continue
-                
+
         session.commit()
         print(f"Emission data: {success_count} success, {error_count} errors")
-        
+
+
 def get_all_data():
     """Fetch all data for visualization using SQLModel joins with proper relationships"""
     try:
@@ -524,6 +557,7 @@ def get_all_data():
     except Exception as e:
         st.error(f"Error fetching data: {str(e)}")
         return pd.DataFrame()
+
 
 # =============================================================================
 # DATA PROCESSING PIPELINE
@@ -632,6 +666,7 @@ class DataPipeline:
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
             return None
+
 
 # =============================================================================
 # STREAMLIT UI COMPONENTS
@@ -1040,6 +1075,7 @@ def create_prediction_interface(pipeline):
         "🤖 **Model Info:** Predictions are based on historical data patterns and should be used as estimates for planning purposes."
     )
 
+
 # =============================================================================
 # APPLICATION INITIALIZATION WITH BETTER ERROR HANDLING
 # =============================================================================
@@ -1053,55 +1089,61 @@ def initialize_app():
         if not success:
             st.error("❌ Failed to initialize database!")
             st.stop()
-            
+
         # Load data with proper relationships
         data_dir = os.path.join(os.path.dirname(__file__), "data")
-        
+
         # Check if data directory exists
         if not os.path.exists(data_dir):
             print(f"Warning: Data directory {data_dir} does not exist")
-            st.warning("⚠️ Data directory not found. Please ensure CSV files are in the 'data' folder.")
+            st.warning(
+                "⚠️ Data directory not found. Please ensure CSV files are in the 'data' folder."
+            )
             pipeline = DataPipeline()
             return pipeline
-        
+
         # Check for required CSV files
         required_files = ["countries.csv", "economic_data.csv", "emissions.csv"]
         missing_files = []
-        
+
         for file in required_files:
             file_path = os.path.join(data_dir, file)
             if not os.path.exists(file_path):
                 missing_files.append(file)
-        
+
         if missing_files:
             print(f"Warning: Missing CSV files: {missing_files}")
             st.warning(f"⚠️ Missing CSV files: {', '.join(missing_files)}")
             pipeline = DataPipeline()
             return pipeline
-        
+
         try:
             # First load countries to get the mapping
             print("Loading countries...")
-            country_map = load_countries(os.path.join(data_dir, "countries.csv"))
-            
+            country_map = load_countries(
+                os.path.join(data_dir, "countries.csv")
+            )
+
             if not country_map:
                 print("Failed to load countries")
                 st.error("❌ Failed to load countries data")
                 pipeline = DataPipeline()
                 return pipeline
-            
+
             # Then load economic and emission data using the country mapping
             print("Loading economic data...")
             load_economic_data(
                 os.path.join(data_dir, "economic_data.csv"), country_map
             )
-            
+
             print("Loading emission data...")
-            load_emission_data(os.path.join(data_dir, "emissions.csv"), country_map)
-            
+            load_emission_data(
+                os.path.join(data_dir, "emissions.csv"), country_map
+            )
+
             print("Data loading complete with proper relationships.")
             st.success("✅ Data loaded successfully!")
-            
+
         except Exception as e:
             print(f"Error during data loading: {str(e)}")
             st.error(f"❌ Error loading data: {str(e)}")
@@ -1109,6 +1151,7 @@ def initialize_app():
     # Initialize pipeline
     pipeline = DataPipeline()
     return pipeline
+
 
 # =============================================================================
 # MAIN APPLICATION
@@ -1296,7 +1339,5 @@ async def main():
                 "💡 Use 'Data Input' for manual entry or 'Bulk Upload' for CSV files"
             )
 
-
-# Run the application
 if __name__ == "__main__":
     asyncio.run(main())

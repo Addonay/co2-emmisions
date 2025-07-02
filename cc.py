@@ -14,16 +14,13 @@ from sklearn.preprocessing import MinMaxScaler
 from sqlalchemy import create_engine, inspect, text
 
 # %% CONFIGURATION SETUP
-# Set polars display configurations for better data viewing and visualization theme
-pl.Config.set_tbl_rows(-1)  # Show all rows
-pl.Config.set_tbl_cols(15)  # Show more columns
+pl.Config.set_tbl_rows(12) 
 sns.set_theme(style="whitegrid")
 plt.rcParams["figure.figsize"] = (12, 8)
 
 # %% IMPORTING THE DATASET
-# Load the dataset with comprehensive null value handling for better data quality
 df = pl.read_csv(
-    "dataset.csv",
+    "data/dataset.csv",
     null_values=["", " ", "NA", "N/A", "nan", "NaN", "null", "Null", "NULL"],
     try_parse_dates=True,
 )
@@ -32,7 +29,6 @@ print(f"Dataset shape: {df.shape}")
 df.head(10)
 
 # %% INSPECTING AND UNDERSTANDING THE DATASET
-# Comprehensive data exploration to understand structure, types, and quality
 print("=== DATASET INFO ===")
 print(f"Shape: {df.shape}")
 print(f"Columns: {df.columns}")
@@ -65,8 +61,7 @@ print("\n=== DESCRIPTIVE STATISTICS ===")
 df.select(cs.numeric()).describe()
 
 # %% SORTING OUT MISSING VALUES
-# Remove columns with excessive missing values and handle remaining nulls strategically
-threshold = 0.5  # 50% threshold for column removal
+threshold = 0.5  
 columns_to_drop = [
     col
     for col, null_count in zip(df.columns, df.null_count().row(0))
@@ -75,7 +70,6 @@ columns_to_drop = [
 
 print(f"Columns to be dropped (>{threshold * 100}% null): {columns_to_drop}")
 
-# Drop columns with too many missing values
 if columns_to_drop:
     df = df.drop(columns_to_drop)
 
@@ -87,7 +81,6 @@ df = df.with_columns(
     ]
 )
 
-# Create a cleaned dataset copy for later use
 df_cleaned_initial = df.clone()
 print(f"Dataset after cleaning: {df.shape}")
 
@@ -96,7 +89,6 @@ print(f"Dataset after cleaning: {df.shape}")
 numerical_cols = df.select(cs.numeric()).columns
 print(f"Numerical columns for scaling: {numerical_cols}")
 
-# Convert to pandas temporarily for sklearn scaling, then back to polars
 df_pandas = df.to_pandas()
 scaler = MinMaxScaler()
 df_pandas[numerical_cols] = scaler.fit_transform(df_pandas[numerical_cols])
@@ -106,7 +98,6 @@ print("Data standardization completed!")
 df_scaled.head()
 
 # %% CHECK FOR OUTLIERS
-# Identify outliers in key features using boxplots for visual analysis
 features_to_check = [
     "Total CO2 Emission excluding LUCF (Mt)",
     "GDP PER CAPITA (USD)",
