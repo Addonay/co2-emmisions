@@ -9,3 +9,5 @@ wheels/
 # Virtual environments
 .venv
 .zed
+.env
+init_db.sql

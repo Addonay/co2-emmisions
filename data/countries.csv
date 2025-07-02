@@ -1,55 +1,55 @@
 country_id,Country,Sub-Region,Code,area_km2
-0,South Africa,Southern Africa,ZAF,1221037.0
-1,Central African Republic,Middle Africa,CAF,622984.0
-2,Morocco,Northern Africa,MAR,446550.0
-3,Burundi,Eastern Africa,BDI,27834.0
-4,Liberia,Western Africa,LBR,111369.0
-5,Equatorial Guinea,Middle Africa,GNQ,28051.0
-6,Eswatini,Southern Africa,SWZ,17364.0
-7,Mauritania,Western Africa,MRT,1030700.0
-8,Malawi,Eastern Africa,MWI,118484.0
-9,Republic of Congo,Middle Africa,COG,342000.0
-10,South Sudan,Eastern Africa,SSD,619745.0
-11,Cameroon,Middle Africa,CMR,475442.0
-12,Tunisia,Northern Africa,TUN,163610.0
-13,Democratic Republic of Congo,Middle Africa,COD,2345409.0
-14,Namibia,Southern Africa,NAM,825615.0
-15,Sao Tome and Principe,Middle Africa,STP,964.0
-16,Zimbabwe,Eastern Africa,ZWE,390757.0
-17,Gambia,Western Africa,GMB,10689.0
-18,Uganda,Eastern Africa,UGA,241550.0
-19,Mali,Western Africa,MLI,1240192.0
-20,Sudan,Northern Africa,SDN,1886068.0
-21,Comoros,Eastern Africa,COM,1862.0
-22,Guinea,Western Africa,GIN,245857.0
-23,Somalia,Eastern Africa,SOM,637657.0
-24,Ethiopia,Eastern Africa,ETH,1104300.0
-25,Egypt,Northern Africa,EGY,1002450.0
-26,Mozambique,Eastern Africa,MOZ,801590.0
-27,Tanzania,Eastern Africa,TZA,945087.0
-28,Botswana,Southern Africa,BWA,582000.0
-29,Rwanda,Eastern Africa,RWA,26338.0
-30,Eritrea,Eastern Africa,ERI,117600.0
-31,Benin,Western Africa,BEN,112622.0
-32,Libya,Northern Africa,LBY,1759540.0
-33,Lesotho,Southern Africa,LSO,30355.0
-34,Niger,Western Africa,NER,1267000.0
-35,Algeria,Northern Africa,DZA,2381741.0
-36,Angola,Middle Africa,AGO,1246700.0
-37,Senegal,Western Africa,SEN,196722.0
-38,Cabo Verde,Western Africa,CPV,4033.0
-39,Guinea-Bissau,Western Africa,GNB,36125.0
-40,Burkina Faso,Western Africa,BFA,272967.0
-41,Togo,Western Africa,TGO,56785.0
-42,Ghana,Western Africa,GHA,238533.0
-43,Sierra Leone,Western Africa,SLE,71740.0
-44,Cote d'Ivoire,Western Africa,CIV,322463.0
-45,Gabon,Middle Africa,GAB,267668.0
-46,Kenya,Eastern Africa,KEN,580367.0
-47,Madagascar,Eastern Africa,MDG,587041.0
-48,Zambia,Eastern Africa,ZMB,752612.0
-49,Seychelles,Eastern Africa,SYC,452.0
-50,Chad,Middle Africa,TCD,1284000.0
-51,Djibouti,Eastern Africa,DJI,23200.0
-52,Nigeria,Western Africa,NGA,923768.0
-53,Mauritius,Eastern Africa,MUS,2040.0
+0,South Sudan,Eastern Africa,SSD,619745.0
+1,Mozambique,Eastern Africa,MOZ,801590.0
+2,Cameroon,Middle Africa,CMR,475442.0
+3,Mali,Western Africa,MLI,1240192.0
+4,Eswatini,Southern Africa,SWZ,17364.0
+5,Niger,Western Africa,NER,1267000.0
+6,Somalia,Eastern Africa,SOM,637657.0
+7,Togo,Western Africa,TGO,56785.0
+8,Benin,Western Africa,BEN,112622.0
+9,Sao Tome and Principe,Middle Africa,STP,964.0
+10,Libya,Northern Africa,LBY,1759540.0
+11,Mauritania,Western Africa,MRT,1030700.0
+12,Central African Republic,Middle Africa,CAF,622984.0
+13,Zambia,Eastern Africa,ZMB,752612.0
+14,Seychelles,Eastern Africa,SYC,452.0
+15,Equatorial Guinea,Middle Africa,GNQ,28051.0
+16,Malawi,Eastern Africa,MWI,118484.0
+17,Kenya,Eastern Africa,KEN,580367.0
+18,Sudan,Northern Africa,SDN,1886068.0
+19,Republic of Congo,Middle Africa,COG,342000.0
+20,Morocco,Northern Africa,MAR,446550.0
+21,Guinea,Western Africa,GIN,245857.0
+22,Botswana,Southern Africa,BWA,582000.0
+23,Eritrea,Eastern Africa,ERI,117600.0
+24,South Africa,Southern Africa,ZAF,1221037.0
+25,Chad,Middle Africa,TCD,1284000.0
+26,Lesotho,Southern Africa,LSO,30355.0
+27,Ethiopia,Eastern Africa,ETH,1104300.0
+28,Democratic Republic of Congo,Middle Africa,COD,2345409.0
+29,Egypt,Northern Africa,EGY,1002450.0
+30,Gambia,Western Africa,GMB,10689.0
+31,Cote d'Ivoire,Western Africa,CIV,322463.0
+32,Nigeria,Western Africa,NGA,923768.0
+33,Zimbabwe,Eastern Africa,ZWE,390757.0
+34,Mauritius,Eastern Africa,MUS,2040.0
+35,Sierra Leone,Western Africa,SLE,71740.0
+36,Namibia,Southern Africa,NAM,825615.0
+37,Cabo Verde,Western Africa,CPV,4033.0
+38,Tunisia,Northern Africa,TUN,163610.0
+39,Liberia,Western Africa,LBR,111369.0
+40,Rwanda,Eastern Africa,RWA,26338.0
+41,Gabon,Middle Africa,GAB,267668.0
+42,Comoros,Eastern Africa,COM,1862.0
+43,Ghana,Western Africa,GHA,238533.0
+44,Senegal,Western Africa,SEN,196722.0
+45,Djibouti,Eastern Africa,DJI,23200.0
+46,Uganda,Eastern Africa,UGA,241550.0
+47,Algeria,Northern Africa,DZA,2381741.0
+48,Tanzania,Eastern Africa,TZA,945087.0
+49,Madagascar,Eastern Africa,MDG,587041.0
+50,Guinea-Bissau,Western Africa,GNB,36125.0
+51,Burkina Faso,Western Africa,BFA,272967.0
+52,Burundi,Eastern Africa,BDI,27834.0
+53,Angola,Middle Africa,AGO,1246700.0
